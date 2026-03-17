@@ -1,0 +1,6 @@
+node_modeules/
+dist/
+build/
+.env
+logs/
+.DS_Store
