@@ -30,23 +30,48 @@ class ProductRepository implements IProductRepository {
         };
     }
 
-    async findAll(page: number, limit: number, search?: string): Promise<{ data: Product[], total: number }> {
-        let pool = db.getPool();
+    async findAll(
+        page: number,
+        limit: number,
+        search?: string
+    ): Promise<{ data: Product[]; total: number }> {
+
+        const pool = db.getPool();
         const offset = (page - 1) * limit;
+
         let query = `SELECT * FROM products`;
-        let countQuery = `SELECT COUNT(*) AS total FROM  products`;
-        let values: any[] = [];
-        if (search) {
+        let countQuery = `SELECT COUNT(*) AS total FROM products`;
+
+        const values: any[] = [];
+        const countValues: any[] = [];
+
+        const hasSearch = typeof search === "string" && search.trim() !== "";
+
+        if (hasSearch) {
             query += ` WHERE name LIKE ?`;
             countQuery += ` WHERE name LIKE ?`;
-            values.push(`%${search}%`);
+
+            const searchValue = `%${search}%`;
+            values.push(searchValue);
+            countValues.push(searchValue);
         }
-        query += ` LIMIT ? OFFSET ?`;
-        values.push(limit, offset);
-        let [rows]: any = await pool.execute(query, values);
-        const [countResult]: any = await pool.execute(countQuery, search ? [`%${search}%`] : []);
-        const total = countResult[0].total;
-        return { data: rows, total };
+
+        // ✅ IMPORTANT: Do NOT use placeholders for LIMIT/OFFSET
+        query += ` ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`;
+
+        // Debug (optional)
+        console.log("QUERY:", query);
+        console.log("VALUES:", values);
+
+        const [rows] = await pool.execute(query, values);
+        const [countResult] = await pool.execute(countQuery, countValues);
+
+        const total = (countResult as any)[0].total;
+
+        return {
+            data: rows as Product[],
+            total
+        };
     }
 
     async update(id: number, product: Partial<Product>): Promise<void> {

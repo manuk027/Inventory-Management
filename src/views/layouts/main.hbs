@@ -1,0 +1,22 @@
+<h1>Edit Product</h1>
+
+<form method="POST" action="/update/{{data.id}}">
+  <div>
+    <label>Name:</label>
+    <input type="text" name="name" value="{{data.name}}" required />
+  </div>
+
+  <div>
+    <label>Price:</label>
+    <input type="number" name="price" value="{{data.price}}" required />
+  </div>
+
+  <div>
+    <label>Quantity:</label>
+    <input type="number" name="quantity" value="{{data.quantity}}" required />
+  </div>
+
+  <button type="submit">Update</button>
+</form>
+
+<a href="/">Back</a>

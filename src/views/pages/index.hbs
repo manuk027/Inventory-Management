@@ -1,0 +1,32 @@
+<h1>Products</h1>
+
+<a href="/create">Add Product</a>
+
+<table border="1" cellpadding="5">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each data}}
+    <tr>
+      <td>{{this.id}}</td>
+      <td>{{this.name}}</td>
+      <td>{{this.price}}</td>
+      <td>{{this.quantity}}</td>
+      <td>
+        <a href="/edit/{{this.id}}">Edit</a>
+
+        <form action="/delete/{{this.id}}" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
