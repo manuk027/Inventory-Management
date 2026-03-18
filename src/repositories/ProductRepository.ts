@@ -5,11 +5,12 @@ class ProductRepository implements IProductRepository {
     async create(product: Product): Promise<Product> {
         const pool = db.getPool();
         const query = `INSERT INTO products (name, price) VALUES (?, ?)`;
-        const [result]: any = await pool.execute(query, [product.name, product.price]);
+        const [result]: any = await pool.execute(query, [product.name, product.price, product.quantity]);
         return {
             id: result.insertId,
             name: product.name,
             price: product.price,
+            quantity: product.quantity,
             created_at: new Date(),
         }
     }
@@ -24,6 +25,7 @@ class ProductRepository implements IProductRepository {
             id: rows.id,
             name: row.name,
             price: row.price,
+            quantity: row.quantity,
             created_at: row.created_at,
         };
     }

@@ -12,7 +12,7 @@ class EnvConfig {
         this.PORT = Number(process.env.PORT) || 3000;
         this.DB_HOST = this.getEnv('DB_HOST');
         this.DB_USER = this.getEnv('DB_USER');
-        this.DB_PASSWORD = this.getEnv('DB_PASSWORD');
+        this.DB_PASSWORD = '';
         this.DB_NAME = this.getEnv('DB_NAME');
     }
 
