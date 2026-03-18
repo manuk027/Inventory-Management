@@ -1,5 +1,4 @@
 import { IProductRepository, Product } from "../interfaces/IProductRepository.js";
-
 import { db } from '../config/db.js'
 
 class ProductRepository implements IProductRepository {
@@ -36,17 +35,16 @@ class ProductRepository implements IProductRepository {
         let countQuery = `SELECT COUNT(*) AS total FROM  products`;
         let values: any[] = [];
         if (search) {
-            query += ` WHERE name LIKE ?`; //select * form products where name like ?;
-            countQuery += ` WHERE name LIKE ?`; //select count(*) as total from products where name like ?;
+            query += ` WHERE name LIKE ?`;
+            countQuery += ` WHERE name LIKE ?`;
             values.push(`%${search}%`);
         }
-        query += ` LIMIT ? OFFSET ?`; //select * form products where name like ? limit ? offset ? ;
-        values.push(limit, offset); //values = ['%val%', limit, offset]
+        query += ` LIMIT ? OFFSET ?`;
+        values.push(limit, offset);
         let [rows]: any = await pool.execute(query, values);
         const [countResult]: any = await pool.execute(countQuery, search ? [`%${search}%`] : []);
         const total = countResult[0].total;
         return { data: rows, total };
-        //2, 3, a
     }
 
     async update(id: number, product: Partial<Product>): Promise<void> {
