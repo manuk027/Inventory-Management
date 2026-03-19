@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import OrderService from "../services/OrdersServices.js";
+import OrderService from "../services/OrderService.js";
 import OrderRepository from "../repositories/OrderRepository.js";
 import ProductRepository from "../repositories/ProductRepository.js";
 
@@ -11,18 +11,18 @@ class OrderController {
             new ProductRepository()
         );
     }
+
     createOrder = async (req: Request, res: Response) => {
         try {
-            const product_id = Number(req.body.product_id);
-            const quantity = Number(req.body.quantity);
-            if (isNaN(product_id) || isNaN(quantity)) {
-                return res.status(400).json({ message: "Invalid input" });
+            const page = Number(req.query.page);
+            const limit = Number(req.query.limit);
+            if ((req.query.page && isNaN(page)) || (req.query.limit && isNaN(limit))) {
+                return res.status(400).json({ message: "Invalid pagination values" });
             }
-            const order = await this.orderService.createOrder({
-                product_id,
-                quantity
-            });
-            res.status(201).json(order);
+            const safePage = page > 0 ? page : 1;
+            const safeLimit = limit > 0 ? limit : 10;
+            const result = await this.orderService.getAllOrders(safePage, safeLimit);
+            res.status(201).json(result);
         } catch (error: any) {
             res.status(400).json({ message: error.message });
         }

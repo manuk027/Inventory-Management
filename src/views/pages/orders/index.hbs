@@ -1,0 +1,47 @@
+<h1>Orders</h1>
+
+<a href="/orders/create">Create Order</a>
+
+<br><br>
+
+<table border="1" cellpadding="5">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Product</th>
+      <th>Quantity</th>
+      <th>Total Price</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {{#each data}}
+    <tr>
+      <td>{{this.id}}</td>
+      <td>{{this.product_name}}</td>
+      <td>{{this.quantity}}</td>
+      <td>{{this.total_price}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<br>
+
+<div>
+  {{#if (gt currentPage 1)}}
+    <a href="/orders?page={{decrement currentPage}}">Previous</a>
+  {{/if}}
+
+  {{#each pages}}
+    {{#if (eq this ../currentPage)}}
+      <strong>{{this}}</strong>
+    {{else}}
+      <a href="/orders?page={{this}}">{{this}}</a>
+    {{/if}}
+  {{/each}}
+
+  {{#if (lt currentPage totalPages)}}
+    <a href="/orders?page={{increment currentPage}}">Next</a>
+  {{/if}}
+</div>

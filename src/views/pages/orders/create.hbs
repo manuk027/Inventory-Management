@@ -1,0 +1,50 @@
+<h1>Create Order</h1>
+
+{{#if error}}
+  <p>{{error}}</p>
+{{/if}}
+
+<form method="POST" action="/orders/create">
+
+  <table>
+    <tr>
+      <td><label for="product">Product:</label></td>
+      <td>
+        <select name="product_id" id="product" required>
+          <option value="" disabled selected>Select Product</option>
+
+          {{#each products}}
+            <option value="{{this.id}}" {{#if (eq this.quantity 0)}}disabled{{/if}}>
+              {{this.name}} - ₹{{this.price}} (Stock: {{this.quantity}})
+            </option>
+          {{/each}}
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td><label for="quantity">Quantity:</label></td>
+      <td>
+        <input 
+          type="number" 
+          name="quantity" 
+          id="quantity" 
+          required 
+          min="1"
+        />
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td>
+        <button type="submit">Place Order</button>
+      </td>
+    </tr>
+  </table>
+
+</form>
+
+<br>
+
+<a href="/orders">Back</a>

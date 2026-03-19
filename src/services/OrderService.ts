@@ -9,18 +9,28 @@ class OrderService {
         this.productRepository = productRepository;
     }
     async createOrder(order: CreateOrder): Promise<Order> {
+        if (order.quantity <= 0) {
+            throw new Error("Quantity must be greater than 0");
+        }
+
         const product = await this.productRepository.findById(order.product_id);
+
         if (!product) {
             throw new Error("Product not found");
         }
+
         if (order.quantity > product.quantity) {
             throw new Error("Insufficient stock");
         }
+
         const total_price = product.price * order.quantity;
+
         const newQuantity = product.quantity - order.quantity;
+
         await this.productRepository.update(product.id, {
             quantity: newQuantity
         });
+
         return this.orderRepository.create({
             product_id: order.product_id,
             quantity: order.quantity,

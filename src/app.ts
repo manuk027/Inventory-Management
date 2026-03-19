@@ -3,6 +3,7 @@ import productRoutes from './routes/ProductRoutes.js';
 import viewRoutes from './routes/ViewRoutes.js';
 import path from 'path';
 import hbs from 'hbs';
+import orderViewRoutes from "./routes/orderViewRoutes.js";
 
 const app: Application = express();
 
@@ -21,5 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/products', productRoutes);
 app.use("/", viewRoutes);
+app.use("/orders", orderViewRoutes);
 
 export default app;

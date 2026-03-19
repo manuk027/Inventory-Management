@@ -14,18 +14,38 @@ class OrderRepository implements IOrderRepository {
             created_at: new Date(),
         }
     };
-    async findAll(page: number, limit: number): Promise<{ data: Order[]; total: number; }> {
+    async findAll(page: number, limit: number) {
         const pool = db.getPool();
-        const offset = (page - 1) * limit;
-        const query = `SELECT * FROM orders LIMIT ? OFFSET ?`;
+
+        const safePage = page > 0 ? page : 1;
+        const safeLimit = limit > 0 ? limit : 10;
+
+        const offset = (safePage - 1) * safeLimit;
+
+        const query = `
+        SELECT 
+            orders.*,
+            products.name AS product_name
+        FROM orders
+        JOIN products ON orders.product_id = products.id
+        LIMIT ${safeLimit} OFFSET ${offset}
+    `;
+
         const countQuery = `SELECT COUNT(*) AS total FROM orders`;
-        const [rows]: any = await pool.execute(query, [limit, offset]);
+
+        const [rows]: any = await pool.execute(query);
         const [countResult]: any = await pool.execute(countQuery);
+
+        const total = countResult[0].total;
+        const totalPages = Math.max(1, Math.ceil(total / safeLimit));
+
         return {
             data: rows,
-            total: countResult[0].total
+            total,
+            currentPage: safePage,
+            totalPages
         };
-    };
+    }
     async findById(id: number): Promise<Order | null> {
         const pool = db.getPool();
         const query = `SELECT * FROM orders WHERE id = ?`;
