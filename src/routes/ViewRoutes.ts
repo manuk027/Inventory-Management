@@ -8,13 +8,23 @@ const productService = new ProductService(new ProductRepository);
 
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const result = await productService.getAllProducts(1, 10);
-        res.render("pages/index", { data: result.data });
+        const page = Number(req.query.page) || 1;
+        const limit = 5;
+        const search = req.query.search as string || "";
+        const result = await productService.getAllProducts(page, limit, search);
+        const totalPages = Math.ceil(result.total / limit);
+        const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+        res.render("pages/index", {
+            data: result.data,
+            currentPage: page,
+            totalPages,
+            pages,
+            search
+        });
     } catch (error: any) {
         res.status(500).send(error.message);
     }
 });
-
 router.get("/create", (req: Request, res: Response) => {
     res.render("pages/create");
 });
@@ -63,6 +73,7 @@ router.post('/delete/:id', async (req: Request, res: Response) => {
         if (isNaN(id)) return res.status(400).send("Invalid ID");
         const product = await productService.getProductById(id);
         if (!product) return res.status(404).send("Product not found");
+        await productService.deleteProduct(id);
         res.redirect('/');
     } catch (error: any) {
         res.status(500).send(error.message);
