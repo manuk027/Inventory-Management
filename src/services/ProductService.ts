@@ -1,11 +1,11 @@
-import { IProductRepository, Product } from "../interfaces/IProductRepository.js";
+import { IProductRepository, Product, CreateProduct } from "../interfaces/IProductRepository.js";
 
 class ProductService {
     private productRepository: IProductRepository;
     constructor(productRepository: IProductRepository) {
         this.productRepository = productRepository;
     }
-    async createProduct(product: Product): Promise<Product> {
+    async createProduct(product: CreateProduct): Promise<Product> {
         if (product.quantity < 0) throw new Error("Quantity cannot be negative");
         return this.productRepository.create(product);
     }
@@ -13,7 +13,6 @@ class ProductService {
         return this.productRepository.findById(id);
     }
     async getAllProducts(page: number, limit: number, search?: string): Promise<{ data: Product[], total: number }> {
-        console.log("asfd")
         return this.productRepository.findAll(page, limit, search);
     }
     async updateProduct(id: number, product: Partial<Product>): Promise<void> {

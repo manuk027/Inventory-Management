@@ -1,10 +1,10 @@
-import { IProductRepository, Product } from "../interfaces/IProductRepository.js";
+import { CreateProduct, IProductRepository, Product } from "../interfaces/IProductRepository.js";
 import { db } from '../config/db.js'
 
 class ProductRepository implements IProductRepository {
-    async create(product: Product): Promise<Product> {
+    async create(product: CreateProduct): Promise<Product> {
         const pool = db.getPool();
-        const query = `INSERT INTO products (name, price) VALUES (?, ?)`;
+        const query = `INSERT INTO products (name, price, quantity) VALUES (?, ?, ?)`;
         const [result]: any = await pool.execute(query, [product.name, product.price, product.quantity]);
         return {
             id: result.insertId,
@@ -22,7 +22,7 @@ class ProductRepository implements IProductRepository {
         if (rows.length === 0) return null;
         const row = rows[0];
         return {
-            id: rows.id,
+            id: row.id,
             name: row.name,
             price: row.price,
             quantity: row.quantity,
@@ -35,18 +35,13 @@ class ProductRepository implements IProductRepository {
         limit: number,
         search?: string
     ): Promise<{ data: Product[]; total: number }> {
-
         const pool = db.getPool();
         const offset = (page - 1) * limit;
-
         let query = `SELECT * FROM products`;
         let countQuery = `SELECT COUNT(*) AS total FROM products`;
-
         const values: any[] = [];
         const countValues: any[] = [];
-
         const hasSearch = typeof search === "string" && search.trim() !== "";
-
         if (hasSearch) {
             query += ` WHERE name LIKE ?`;
             countQuery += ` WHERE name LIKE ?`;
@@ -55,19 +50,10 @@ class ProductRepository implements IProductRepository {
             values.push(searchValue);
             countValues.push(searchValue);
         }
-
-        // ✅ IMPORTANT: Do NOT use placeholders for LIMIT/OFFSET
-        query += ` ORDER BY id DESC LIMIT ${limit} OFFSET ${offset}`;
-
-        // Debug (optional)
-        console.log("QUERY:", query);
-        console.log("VALUES:", values);
-
+        query += ` ORDER BY name asc LIMIT ${limit} OFFSET ${offset}`;
         const [rows] = await pool.execute(query, values);
         const [countResult] = await pool.execute(countQuery, countValues);
-
         const total = (countResult as any)[0].total;
-
         return {
             data: rows as Product[],
             total
@@ -78,7 +64,7 @@ class ProductRepository implements IProductRepository {
         let pool = db.getPool();
         const fields = Object.keys(product);
         const values = Object.values(product);
-        if (fields.length = 0) return;
+        if (fields.length == 0) return;
         const setClause = fields.map(field => `${field}= ?`).join(", ");
         const query = `UPDATE products SET ${setClause} WHERE id = ?`;
         await pool.execute(query, [...values, id]);

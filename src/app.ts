@@ -1,5 +1,6 @@
 import express, { Application } from 'express';
 import productRoutes from './routes/ProductRoutes.js';
+import viewRoutes from './routes/ViewRoutes.js';
 import path from 'path';
 import hbs from 'hbs';
 
@@ -14,5 +15,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/products', productRoutes);
+app.use("/", viewRoutes);
 
 export default app;
