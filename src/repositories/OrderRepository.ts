@@ -34,3 +34,5 @@ class OrderRepository implements IOrderRepository {
         return rows[0];
     }
 }
+
+export default OrderRepository;
